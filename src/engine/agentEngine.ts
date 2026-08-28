@@ -396,7 +396,7 @@ class AgentEconomyEngine {
 
     this.notify();
 
-    // Step 3: Agent Execution (Live Groq call if API key provided, or realistic simulation)
+    // Step 3: Agent Execution (Live Groq call if API key provided or env variable set, or realistic simulation)
     await new Promise((r) => setTimeout(r, 2000));
 
     const result = await this.executeAgentTask(task, winningAgent);
@@ -535,12 +535,13 @@ class AgentEconomyEngine {
 
   private async executeAgentTask(task: Task, agent: Agent): Promise<TaskResult> {
     const proof = generateTxHash();
+    const effectiveGroqKey = agent.groqApiKey || import.meta.env.VITE_GROQ_API_KEY;
 
-    // If agent has a Groq API key, perform a live real-time API call!
-    if (agent.groqApiKey) {
+    // If agent has a Groq API key (or global VITE_GROQ_API_KEY is defined), execute live call
+    if (effectiveGroqKey && agent.modelEngine.includes('groq')) {
       try {
         const groqResult = await callGroqApi({
-          apiKey: agent.groqApiKey,
+          apiKey: effectiveGroqKey,
           model: agent.groqModel || 'llama-3.3-70b-versatile',
           prompt: `Task: ${task.title}\nDescription: ${task.description}\nInput Data: ${task.inputData}\nOutput Requirements: ${task.outputRequirements}`,
           systemPrompt: agent.customSystemPrompt || 'You are an autonomous economic worker on Cersei.ai. Provide precise, valid JSON output conforming to requirements.',

@@ -1,5 +1,5 @@
 export interface GroqCallOptions {
-  apiKey: string;
+  apiKey?: string;
   model?: string;
   prompt: string;
   systemPrompt?: string;
@@ -14,11 +14,14 @@ export interface GroqCallResult {
 }
 
 export async function testGroqConnection(apiKey: string): Promise<boolean> {
+  const key = apiKey.trim() || import.meta.env.VITE_GROQ_API_KEY || '';
+  if (!key) return false;
+
   try {
     const response = await fetch('https://api.groq.com/openai/v1/models', {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${apiKey.trim()}`,
+        Authorization: `Bearer ${key}`,
       },
     });
     return response.ok;
@@ -33,13 +36,18 @@ export async function callGroqApi({
   prompt,
   systemPrompt = 'You are an autonomous economic agent on Cersei.ai. Execute the user task accurately and output strictly clean JSON or structured analysis.',
 }: GroqCallOptions): Promise<GroqCallResult> {
+  const activeKey = apiKey?.trim() || import.meta.env.VITE_GROQ_API_KEY || '';
+  if (!activeKey) {
+    throw new Error('No Groq API Key provided. Enter a key in the registration portal or set VITE_GROQ_API_KEY.');
+  }
+
   const startTime = Date.now();
 
   const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey.trim()}`,
+      Authorization: `Bearer ${activeKey}`,
     },
     body: JSON.stringify({
       model,
@@ -64,7 +72,6 @@ export async function callGroqApi({
 
   let parsedJson: Record<string, any> | undefined;
   try {
-    // Attempt parsing if JSON is returned
     const jsonMatch = rawText.match(/```json([\s\S]*?)```/) || [null, rawText];
     parsedJson = JSON.parse(jsonMatch[1]?.trim() || rawText.trim());
   } catch {
