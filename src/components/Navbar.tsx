@@ -1,10 +1,11 @@
 import React from 'react';
-import { Wallet, Sparkles, RefreshCw, Layers, UserPlus } from 'lucide-react';
+import { Wallet, Sparkles, RefreshCw, Layers, UserPlus, Cpu } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: 'overview' | 'marketplace' | 'pipeline' | 'jury' | 'register' | 'ledger';
   setActiveTab: (tab: 'overview' | 'marketplace' | 'pipeline' | 'jury' | 'register' | 'ledger') => void;
   onOpenTaskModal: () => void;
+  onOpenMLModal: () => void;
   onSeedDemo: () => void;
   onReset: () => void;
   humanAddress: `0x${string}` | null;
@@ -19,6 +20,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   setActiveTab,
   onOpenTaskModal,
+  onOpenMLModal,
   onSeedDemo,
   onReset,
   humanAddress,
@@ -125,6 +127,16 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Right Actions & MetaMask Connect */}
         <div className="flex items-center gap-2 sm:gap-3">
           
+          {/* ML Intelligence Button */}
+          <button
+            onClick={onOpenMLModal}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50/80 px-3 py-1.5 text-xs font-extrabold text-indigo-700 hover:bg-indigo-100 transition cursor-pointer shadow-2xs"
+            title="Open Live Machine Learning Risk & Pricing Engine"
+          >
+            <Cpu className="h-3.5 w-3.5 text-indigo-600" />
+            <span>ML Engine</span>
+          </button>
+
           {/* Post Task Button */}
           <button
             onClick={onOpenTaskModal}

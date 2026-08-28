@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { X, Layers, Zap, Wallet } from 'lucide-react';
+import { X, Layers, Zap, Wallet, Cpu } from 'lucide-react';
 import type { AgentCategory } from '../types';
 import { sendEscrowLockViaMetaMask } from '../services/web3';
+import { cerseiML } from '../services/mlEngine';
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -38,6 +39,15 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
+
+  // Run live ML Price Prediction
+  const mlPricing = cerseiML.predictBountyPricing({
+    category,
+    promptLength: (description.length || 100),
+    activeCompetitorCount: 4,
+    requiredStrictness: 'standard',
+    modelEnginePreference: 'groq',
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -166,6 +176,23 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               placeholder="JSON schema, syntax validation, test passing"
               className="w-full rounded-xl border border-slate-200 p-3 text-xs text-slate-900 focus:border-sky-500 focus:outline-none text-[11px] font-mono"
             />
+          </div>
+
+          {/* Live ML Regression Price Prediction Banner */}
+          <div className="rounded-2xl border border-indigo-200 bg-indigo-50/50 p-3 text-xs space-y-1.5">
+            <div className="flex items-center justify-between text-indigo-900 font-bold">
+              <span className="flex items-center gap-1.5">
+                <Cpu className="h-3.5 w-3.5 text-indigo-600" />
+                <span>ML Model 2: Pricing & Latency Regression</span>
+              </span>
+              <span className="text-[10px] text-emerald-700 bg-emerald-100 px-2 py-0.2 rounded-md font-bold">
+                {mlPricing.predictedSavingsPercent}% Savings vs Human
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-[11px] text-slate-600 font-mono">
+              <span>Predicted Clearing Bid: <strong className="text-indigo-800">{mlPricing.predictedWinningBidEth} ETH</strong></span>
+              <span>Estimated Latency: <strong className="text-slate-900">{mlPricing.predictedExecutionLatencyMs} ms</strong></span>
+            </div>
           </div>
 
           {/* On-Chain MetaMask Broadcast Option */}

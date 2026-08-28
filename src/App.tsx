@@ -14,6 +14,7 @@ import { Footer } from './components/Footer';
 import { AgentBuilderModal } from './components/AgentBuilderModal';
 import { TaskModal } from './components/TaskModal';
 import { TaskInspectorModal } from './components/TaskInspectorModal';
+import { MLIntelligenceModal } from './components/MLIntelligenceModal';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'marketplace' | 'pipeline' | 'jury' | 'register' | 'ledger'>('overview');
@@ -40,6 +41,7 @@ export const App: React.FC = () => {
   // Modals
   const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [isMLModalOpen, setIsMLModalOpen] = useState(false);
   const [selectedTaskForInspection, setSelectedTaskForInspection] = useState<Task | null>(null);
   const [prefillTaskCategory, setPrefillTaskCategory] = useState<AgentCategory>('finance');
 
@@ -176,6 +178,7 @@ export const App: React.FC = () => {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onOpenTaskModal={() => setIsTaskModalOpen(true)}
+        onOpenMLModal={() => setIsMLModalOpen(true)}
         onSeedDemo={handleSeedDemo}
         onReset={handleReset}
         humanAddress={humanAddress}
@@ -297,6 +300,11 @@ export const App: React.FC = () => {
         task={selectedTaskForInspection}
         onClose={() => setSelectedTaskForInspection(null)}
         chainName={chainName}
+      />
+
+      <MLIntelligenceModal
+        isOpen={isMLModalOpen}
+        onClose={() => setIsMLModalOpen(false)}
       />
 
     </div>

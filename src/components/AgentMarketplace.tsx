@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Search, Plus, Sparkles, Shield, Cpu, Award, Zap, CheckCircle2, Copy, Check, Key, Eye, EyeOff, X, UserCheck } from 'lucide-react';
+import { Search, Plus, Sparkles, Shield, Cpu, Award, Zap, CheckCircle2, Copy, Check, Key, Eye, EyeOff, X, UserCheck, Activity } from 'lucide-react';
 import type { Agent, AgentCategory } from '../types';
 import { SpotlightCard } from './reactbits/SpotlightCard';
 import { DecryptedText } from './reactbits/DecryptedText';
+import { cerseiML } from '../services/mlEngine';
 
 interface AgentMarketplaceProps {
   agents: Agent[];
@@ -49,60 +50,75 @@ export const AgentMarketplace: React.FC<AgentMarketplaceProps> = ({
   const getModelBadge = (engine: string, groqModel?: string) => {
     if (engine.includes('groq')) {
       return {
-        label: groqModel ? `⚡ Groq ${groqModel.split('-')[0]}` : '⚡ Groq LPU',
-        color: 'bg-amber-100 text-amber-900 border-amber-300 font-extrabold',
+        label: groqModel ? `Groq (${groqModel.split('-')[0]})` : 'Groq LPU (Sub-Sec)',
+        color: 'bg-emerald-50 text-emerald-700 border-emerald-200 font-bold',
       };
     }
-    if (engine.includes('gemini')) return { label: 'Gemini 2.5', color: 'bg-sky-100 text-sky-800 border-sky-200' };
-    if (engine.includes('claude')) return { label: 'Claude 3.7', color: 'bg-orange-100 text-orange-800 border-orange-200' };
-    if (engine.includes('deepseek')) return { label: 'DeepSeek-V3', color: 'bg-indigo-100 text-indigo-800 border-indigo-200' };
-    if (engine.includes('gpt')) return { label: 'GPT-4o', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' };
-    return { label: 'Custom API', color: 'bg-purple-100 text-purple-800 border-purple-200' };
+    if (engine.includes('claude')) {
+      return { label: 'Claude 3.7 Sonnet', color: 'bg-amber-50 text-amber-700 border-amber-200 font-bold' };
+    }
+    if (engine.includes('gpt')) {
+      return { label: 'GPT-4o', color: 'bg-sky-50 text-sky-700 border-sky-200 font-bold' };
+    }
+    if (engine.includes('deepseek')) {
+      return { label: 'DeepSeek-V3', color: 'bg-purple-50 text-purple-700 border-purple-200 font-bold' };
+    }
+    return { label: 'Gemini 2.5 Flash', color: 'bg-blue-50 text-blue-700 border-blue-200 font-bold' };
   };
 
   return (
-    <section id="marketplace" className="py-16 bg-slate-50/50 border-t border-sky-100">
+    <section id="marketplace" className="py-12 bg-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-sky-600 mb-1">
-              <span>⚡</span>
-              <span>Open Autonomous Arena</span>
+              <span>🤖</span>
+              <span>Autonomous Agent Economy</span>
             </div>
             <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              Agent Registry & Leaderboard
+              Agent Registry & Bidding Directory
             </h2>
             <p className="mt-1 text-sm text-slate-500 max-w-xl">
-              Inspect verified on-chain agents with active collateral stakes, observable execution reputations, and machine capability tags.
+              Inspect on-chain reputations, ML slashing risk scores, Viem smart wallets, and hire agents for autonomous execution.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
+            {agents.length === 0 && (
+              <button
+                onClick={onSeedDemo}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-sky-200 bg-sky-50/80 px-4 py-2.5 text-xs font-bold text-sky-700 transition hover:bg-sky-100 cursor-pointer shadow-2xs"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-sky-500" />
+                <span>Seed 4 Live Demo Agents</span>
+              </button>
+            )}
+
             <button
               onClick={onOpenDeployModal}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-sky-600 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-sky-500/20 transition hover:bg-sky-500 cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-600 to-sky-500 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-sky-500/20 transition hover:from-sky-500 hover:to-sky-400 cursor-pointer"
             >
               <Plus className="h-4 w-4" />
-              <span>Deploy Custom Agent</span>
+              <span>Register New Agent</span>
             </button>
           </div>
         </div>
 
-        {/* Search & Category Filter Pills */}
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 mb-8">
+        {/* Filters & Search */}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
           
           {/* Category Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 lg:pb-0 scrollbar-none">
+          <div className="flex items-center gap-1 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
             {categories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`whitespace-nowrap rounded-xl px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
+                className={`rounded-full px-4 py-1.5 text-xs font-bold whitespace-nowrap transition cursor-pointer ${
                   selectedCategory === cat.id
-                    ? 'bg-sky-600 text-white shadow-sm shadow-sky-500/30'
-                    : 'bg-white border border-slate-200 text-slate-600 hover:border-sky-200 hover:text-sky-700 hover:bg-sky-50/50'
+                    ? 'bg-sky-600 text-white shadow-xs'
+                    : 'bg-slate-100/80 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900'
                 }`}
               >
                 {cat.label}
@@ -129,6 +145,17 @@ export const AgentMarketplace: React.FC<AgentMarketplaceProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredAgents.map((agent) => {
               const badge = getModelBadge(agent.modelEngine, agent.groqModel);
+              
+              // Run real-time ML Risk Prediction for this agent
+              const mlRisk = cerseiML.predictAgentRisk({
+                reputation: agent.reputation,
+                stakeEth: agent.stakeLockedEth,
+                taskBudgetEth: 0.04,
+                winRate: agent.winRate,
+                completedTasks: agent.completedTasks,
+                modelEngine: agent.modelEngine,
+              });
+
               return (
                 <SpotlightCard
                   key={agent.id}
@@ -178,12 +205,29 @@ export const AgentMarketplace: React.FC<AgentMarketplaceProps> = ({
                     </div>
 
                     {/* Description */}
-                    <p className="text-xs text-slate-600 line-clamp-2 mb-4 leading-relaxed">
+                    <p className="text-xs text-slate-600 line-clamp-2 mb-3 leading-relaxed">
                       {agent.description}
                     </p>
 
+                    {/* ML Predictive Risk Tag */}
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-200/80 mb-3 text-[11px]">
+                      <span className="flex items-center gap-1 font-bold text-slate-700">
+                        <Activity className="h-3 w-3 text-sky-600" />
+                        <span>ML Slashing Risk:</span>
+                      </span>
+                      <span
+                        className={`font-extrabold px-2 py-0.5 rounded-md ${
+                          mlRisk.riskTier === 'MINIMAL' || mlRisk.riskTier === 'LOW'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-amber-100 text-amber-800'
+                        }`}
+                      >
+                        {mlRisk.slashingRiskPercent}% ({mlRisk.riskTier})
+                      </span>
+                    </div>
+
                     {/* Capability Tags */}
-                    <div className="flex flex-wrap gap-1.5 mb-5">
+                    <div className="flex flex-wrap gap-1.5 mb-4">
                       {agent.capabilities.map((cap, i) => (
                         <span
                           key={i}
@@ -250,11 +294,11 @@ export const AgentMarketplace: React.FC<AgentMarketplaceProps> = ({
                         </span>
                         <button
                           onClick={() => handleCopy(agent.ethAddress)}
-                          className="text-slate-400 hover:text-sky-600 transition cursor-pointer pl-1"
-                          title="Copy Address"
+                          className="text-slate-400 hover:text-sky-600 p-0.5 cursor-pointer"
+                          title="Copy agent public address"
                         >
                           {copiedAddress === agent.ethAddress ? (
-                            <Check className="h-3.5 w-3.5 text-emerald-600" />
+                            <Check className="h-3.5 w-3.5 text-emerald-500" />
                           ) : (
                             <Copy className="h-3.5 w-3.5" />
                           )}
@@ -264,53 +308,41 @@ export const AgentMarketplace: React.FC<AgentMarketplaceProps> = ({
 
                   </div>
 
-                  {/* Card Bottom CTA */}
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-3">
-                    <div className="text-left">
-                      <span className="text-[10px] text-slate-400">Bid Rate</span>
-                      <div className="text-xs font-extrabold text-slate-800">
-                        {agent.hourlyRateEth} <span className="text-[10px] text-sky-600 font-semibold">ETH/task</span>
+                  {/* Bottom Action: Commission Bounty Task */}
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+                    <div>
+                      <span className="text-[10px] text-slate-400">Target Rate</span>
+                      <div className="text-xs font-extrabold text-slate-900">
+                        {agent.hourlyRateEth} <span className="text-[10px] text-slate-500 font-normal">ETH/task</span>
                       </div>
                     </div>
 
                     <button
                       onClick={() => onSelectAgentForTask(agent)}
-                      className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-sky-600 cursor-pointer"
-                      title="Post a direct bounty for this agent to bid on"
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-sky-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-sky-500 transition cursor-pointer"
                     >
                       <Zap className="h-3.5 w-3.5" />
                       <span>Commission Task</span>
                     </button>
                   </div>
-
                 </SpotlightCard>
               );
             })}
           </div>
         ) : (
-          /* Empty Zero-State */
-          <div className="rounded-3xl border-2 border-dashed border-sky-200 bg-white/70 p-12 text-center backdrop-blur-md">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-50 text-sky-500 mb-4 shadow-inner">
-              <Cpu className="h-8 w-8 animate-pulse" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-800">No Autonomous Agents on Network</h3>
-            <p className="mt-1 text-sm text-slate-500 max-w-md mx-auto">
-              Deploy your first custom autonomous agent with a generated Base Sepolia smart wallet, or seed 4 pre-configured demo agents to observe live bidding.
+          <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50/50 py-16 text-center">
+            <Cpu className="mx-auto h-10 w-10 text-slate-300 mb-3" />
+            <h3 className="text-base font-bold text-slate-800">No Agents in Registry</h3>
+            <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">
+              Get started by registering a custom AI agent or seed the network with 4 high-reputation demo agents.
             </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <button
-                onClick={onOpenDeployModal}
-                className="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-sky-500/20 transition hover:bg-sky-500 cursor-pointer"
-              >
-                <Plus className="h-4 w-4" />
-                <span>Deploy My Agent</span>
-              </button>
+            <div className="mt-5 flex items-center justify-center gap-3">
               <button
                 onClick={onSeedDemo}
-                className="inline-flex items-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2.5 text-xs font-bold text-sky-700 transition hover:bg-sky-100 cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-sky-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-sky-500 cursor-pointer"
               >
-                <Sparkles className="h-4 w-4 text-sky-600" />
-                <span>Seed 4 Demo Agents</span>
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>Seed 4 Live Demo Agents</span>
               </button>
             </div>
           </div>
@@ -318,10 +350,11 @@ export const AgentMarketplace: React.FC<AgentMarketplaceProps> = ({
 
       </div>
 
-      {/* Viem Wallet & Keys Modal */}
+      {/* Agent Keys Inspection Modal */}
       {activeKeyModalAgent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
-          <div className="relative w-full max-w-lg rounded-3xl border border-sky-100 bg-white p-6 shadow-2xl shadow-sky-500/10">
+          <div className="relative w-full max-w-md rounded-3xl border border-sky-100 bg-white p-6 shadow-2xl shadow-sky-500/10">
+            
             <button
               onClick={() => setActiveKeyModalAgent(null)}
               className="absolute right-4 top-4 rounded-full p-1 text-slate-400 hover:bg-slate-100 cursor-pointer"
@@ -329,60 +362,74 @@ export const AgentMarketplace: React.FC<AgentMarketplaceProps> = ({
               <X className="h-5 w-5" />
             </button>
 
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-100 text-sky-600">
-                <Key className="h-5 w-5" />
-              </div>
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                src={activeKeyModalAgent.avatar}
+                alt={activeKeyModalAgent.name}
+                className="h-10 w-10 rounded-xl bg-sky-50 border p-1"
+              />
               <div>
-                <h3 className="text-base font-extrabold text-slate-900">{activeKeyModalAgent.name} - Viem Wallet</h3>
-                <p className="text-[11px] text-slate-500">Autonomous Cryptographic Account</p>
+                <h3 className="text-base font-extrabold text-slate-900">{activeKeyModalAgent.name}</h3>
+                <p className="text-xs text-slate-500">Autonomous Viem Smart Wallet</p>
               </div>
             </div>
 
             <div className="space-y-3 text-xs">
+              
+              {/* Public Address */}
               <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">Public Address (EVM)</label>
-                <div className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200 font-mono text-slate-800">
+                <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">
+                  Public EVM Smart Account Address
+                </label>
+                <div className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200 font-mono text-[11px] text-slate-800">
                   <span className="truncate">{activeKeyModalAgent.ethAddress}</span>
                   <button
                     onClick={() => handleCopy(activeKeyModalAgent.ethAddress)}
                     className="text-slate-400 hover:text-sky-600 pl-2 cursor-pointer"
                   >
-                    <Copy className="h-4 w-4" />
+                    {copiedAddress === activeKeyModalAgent.ethAddress ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
 
+              {/* Private Key */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-[10px] font-bold uppercase text-slate-400">Private Key (For Autonomous Signing)</label>
+                  <label className="text-[10px] font-bold uppercase text-slate-400">
+                    Agent Private Key (Machine Signer)
+                  </label>
                   <button
                     onClick={() => setRevealPrivateKey(!revealPrivateKey)}
-                    className="text-[10px] text-sky-600 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                    className="text-[10px] font-bold text-sky-600 hover:underline flex items-center gap-1 cursor-pointer"
                   >
                     {revealPrivateKey ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
                     <span>{revealPrivateKey ? 'Hide' : 'Reveal'}</span>
                   </button>
                 </div>
-                <div className="flex items-center justify-between bg-slate-900 p-2.5 rounded-xl border border-slate-800 font-mono text-sky-300">
+
+                <div className="flex items-center justify-between bg-slate-900 p-2.5 rounded-xl border border-slate-800 font-mono text-[11px] text-sky-400">
                   <span className="truncate">
-                    {revealPrivateKey
-                      ? activeKeyModalAgent.privateKey
-                      : activeKeyModalAgent.privateKey.slice(0, 12) + '••••••••••••••••••••••••••••••••'}
+                    {revealPrivateKey ? activeKeyModalAgent.privateKey : '•'.repeat(48)}
                   </span>
                   <button
                     onClick={() => handleCopy(activeKeyModalAgent.privateKey)}
                     className="text-slate-400 hover:text-sky-400 pl-2 cursor-pointer"
                   >
-                    <Copy className="h-4 w-4" />
+                    {copiedAddress === activeKeyModalAgent.privateKey ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-3 text-[11px] text-emerald-900">
-                <span className="font-bold">Locked Performance Stake:</span> {activeKeyModalAgent.stakeLockedEth} ETH held in CerseiEscrow contract.
+              {/* Collateral & Autonomous Info */}
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-3 text-[11px] text-emerald-900">
+                <div className="font-bold mb-0.5">Autonomous Execution Ready</div>
+                <p className="text-emerald-800/80 leading-relaxed">
+                  This wallet allows {activeKeyModalAgent.name} to sign reverse-auction bids and lock its {activeKeyModalAgent.stakeLockedEth} ETH collateral without manual user approvals.
+                </p>
               </div>
+
             </div>
+
           </div>
         </div>
       )}
