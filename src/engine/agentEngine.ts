@@ -12,11 +12,11 @@ export const generateTxHash = (): string => {
   return hash;
 };
 
-// Initial empty storage keys
-const STORAGE_KEY_AGENTS = 'cersei_agents_v1';
-const STORAGE_KEY_TASKS = 'cersei_tasks_v1';
-const STORAGE_KEY_LOGS = 'cersei_logs_v1';
-const STORAGE_KEY_SLASHING = 'cersei_slashing_v1';
+// Initial storage keys
+const STORAGE_KEY_AGENTS = 'cersei_agents_v2';
+const STORAGE_KEY_TASKS = 'cersei_tasks_v2';
+const STORAGE_KEY_LOGS = 'cersei_logs_v2';
+const STORAGE_KEY_SLASHING = 'cersei_slashing_v2';
 
 class AgentEconomyEngine {
   private agents: Agent[] = [];
@@ -29,6 +29,10 @@ class AgentEconomyEngine {
 
   constructor() {
     this.loadState();
+    // Pre-populate 3 specialized agents if the marketplace is currently empty
+    if (this.agents.length === 0) {
+      this.seedDefaultAgents();
+    }
   }
 
   public subscribe(listener: () => void) {
@@ -171,14 +175,17 @@ class AgentEconomyEngine {
     return newAgent;
   }
 
-  public seedDemoAgents() {
-    if (this.agents.length > 0) return;
+  /**
+   * Seed the 3 Pre-Built Primary Agents + 1 Jury Referee
+   */
+  public seedDefaultAgents() {
+    this.agents = [];
 
-    const demoData = [
+    const defaultAgentProfiles = [
       {
-        name: 'Groq-Llama3.3-Ultra',
-        role: 'Sub-Second Research & Intelligence Bot',
-        description: 'Runs Llama-3.3-70B on Groq LPUs at ~500 tokens/sec for instant fact-checking and structured data synthesis.',
+        name: 'Groq-NewsIntel-70B',
+        role: 'Sub-Second Research & Fact-Checker',
+        description: 'Runs Llama-3.3-70B on Groq Cloud LPUs at ~500 tokens/sec. Specialized in fact-checking articles, summarizing news, and structured JSON synthesis.',
         category: 'data_extraction' as AgentCategory,
         modelEngine: 'groq-llama-3.3-70b' as ModelEngine,
         groqModel: 'llama-3.3-70b-versatile',
@@ -191,54 +198,54 @@ class AgentEconomyEngine {
         totalEarningsEth: 2.10,
       },
       {
-        name: 'AegisCode-Audit',
+        name: 'AegisSecurity-Audit',
         role: 'Solidity Smart Contract Security Auditor',
-        description: 'Scans contracts for reentrancy bugs, flash loan attack vectors, access control flaws, and gas bottlenecks.',
+        description: 'Scans Solidity contracts for reentrancy vulnerabilities, flash loan attack vectors, access control bugs, and gas optimization bottlenecks.',
         category: 'code_audit' as AgentCategory,
         modelEngine: 'claude-3-7-sonnet' as ModelEngine,
         capabilities: ['solidity-security', 'reentrancy-check', 'hack-prevention', 'gas-optimization'],
-        initialStakeEth: 0.50,
-        hourlyRateEth: 0.045,
+        initialStakeEth: 0.40,
+        hourlyRateEth: 0.025,
         reputation: 99,
         completedTasks: 72,
         winRate: 99,
         totalEarningsEth: 3.20,
       },
       {
-        name: 'CryptoSentiment-AI',
+        name: 'DeepSentiment-Alpha',
         role: 'Real-Time Market Sentiment Arbiter',
-        description: 'Analyzes live social media feeds and news headlines to calculate a 0-100 Bull/Bear market sentiment index.',
+        description: 'Analyzes live social media telemetry and crypto news headlines to calculate a calibrated 0-100 Bull/Bear market sentiment score.',
         category: 'sentiment' as AgentCategory,
         modelEngine: 'deepseek-v3' as ModelEngine,
         capabilities: ['bull-bear-score', 'news-aggregation', 'market-sentiment', 'risk-assessment'],
         initialStakeEth: 0.15,
-        hourlyRateEth: 0.008,
-        reputation: 88,
-        completedTasks: 31,
-        winRate: 92,
-        totalEarningsEth: 0.65,
+        hourlyRateEth: 0.010,
+        reputation: 92,
+        completedTasks: 41,
+        winRate: 94,
+        totalEarningsEth: 0.85,
       },
       {
         name: 'ConsensusJury-Prime',
-        role: 'Independent Verification Referee',
-        description: 'Neutral referee agent running automated unit tests, schema assertions, and cross-model validation juries.',
+        role: 'Neutral 3-Node Jury Validator',
+        description: 'Independent referee agent running automated AST syntax tests, schema assertions, and cross-model validation juries.',
         category: 'jury_verifier' as AgentCategory,
         modelEngine: 'gpt-4o' as ModelEngine,
         capabilities: ['jury-verification', 'schema-assertion', 'ground-truth-eval', 'slashing-judge'],
         initialStakeEth: 0.30,
         hourlyRateEth: 0.005,
-        reputation: 97,
+        reputation: 98,
         completedTasks: 110,
         winRate: 100,
         totalEarningsEth: 0.55,
       }
     ];
 
-    demoData.forEach((d) => {
+    defaultAgentProfiles.forEach((d) => {
       const privateKey = generatePrivateKey();
       const account = privateKeyToAccount(privateKey);
       this.agents.push({
-        id: `agent_demo_${Math.random().toString(36).substring(2, 9)}`,
+        id: `agent_${d.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}`,
         name: d.name,
         role: d.role,
         description: d.description,
@@ -264,12 +271,16 @@ class AgentEconomyEngine {
 
     this.addLog({
       type: 'TASK_POSTED',
-      title: 'Demo Agent Network Provisioned',
-      description: 'Connected 4 specialized worker and verification agents with Groq LPU accounts.',
+      title: 'Autonomous Agent Registry Ready',
+      description: 'Connected 3 specialized worker bots and 1 referee jury with live Viem smart accounts.',
       txHash: generateTxHash(),
     });
 
     this.notify();
+  }
+
+  public seedDemoAgents() {
+    this.seedDefaultAgents();
   }
 
   public async postTask(params: {
@@ -644,6 +655,7 @@ class AgentEconomyEngine {
     localStorage.removeItem(STORAGE_KEY_TASKS);
     localStorage.removeItem(STORAGE_KEY_LOGS);
     localStorage.removeItem(STORAGE_KEY_SLASHING);
+    this.seedDefaultAgents();
     this.notify();
   }
 }
