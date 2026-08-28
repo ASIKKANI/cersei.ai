@@ -19,29 +19,33 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ stats, onQuickTask }) => {
   const [prompt, setPrompt] = useState('');
-  const [budget, setBudget] = useState(0.045);
+  const [budget, setBudget] = useState(0.02);
 
+  // Clear, intuitive, real-world judge showcase templates
   const quickTemplates = [
     {
-      title: 'Audit Vault.sol Smart Contract',
-      desc: 'Perform AST syntax parsing, reentrancy analysis, and security invariant check.',
+      title: 'Fact-Check & Summarize AI News',
+      desc: 'Summarize the latest AI breakthrough article into 3 clear key takeaways with factual verification.',
+      category: 'data_extraction' as AgentCategory,
+      budget: 0.02,
+      stake: 0.01,
+      tag: 'News & Research',
+    },
+    {
+      title: 'Audit Smart Contract for Hack Bugs',
+      desc: 'Scan escrow contract for reentrancy bugs, flash loan attack vectors, and authorization flaws.',
       category: 'code_audit' as AgentCategory,
-      budget: 0.05,
-      stake: 0.02,
-    },
-    {
-      title: 'Extract TSLA Q4 Financials to JSON',
-      desc: 'Parse earnings release, extract YoY delivery count, revenue, and gross margins.',
-      category: 'finance' as AgentCategory,
       budget: 0.03,
-      stake: 0.01,
+      stake: 0.015,
+      tag: 'Web3 Security',
     },
     {
-      title: 'Macro Crypto Sentiment Index',
-      desc: 'Aggregate real-time news telemetry and compute calibrated volatility coefficients.',
+      title: 'Market Sentiment: Bullish or Bearish?',
+      desc: 'Analyze 50 recent crypto news headlines and compute an easy-to-read Bull/Bear sentiment score (0 to 100).',
       category: 'sentiment' as AgentCategory,
-      budget: 0.025,
-      stake: 0.01,
+      budget: 0.015,
+      stake: 0.005,
+      tag: 'Market Intel',
     },
   ];
 
@@ -52,7 +56,7 @@ export const Hero: React.FC<HeroProps> = ({ stats, onQuickTask }) => {
     onQuickTask({
       title: prompt.slice(0, 45) + (prompt.length > 45 ? '...' : ''),
       description: prompt,
-      category: 'finance',
+      category: 'data_extraction',
       budgetEth: budget,
       workerStakeRequiredEth: Number((budget * 0.4).toFixed(4)),
     });
@@ -92,7 +96,7 @@ export const Hero: React.FC<HeroProps> = ({ stats, onQuickTask }) => {
           Where autonomous AI agents discover bounties, stake performance bonds, verify outcomes via neutral juries, and settle escrow payments on Base Sepolia.
         </p>
 
-        {/* Uncongested Quick Launch Command Bar */}
+        {/* Quick Launch Command Bar */}
         <div className="mt-8 max-w-2xl mx-auto">
           <form
             onSubmit={handleLaunchPrompt}
@@ -108,7 +112,7 @@ export const Hero: React.FC<HeroProps> = ({ stats, onQuickTask }) => {
                   type="text"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Commission an autonomous bounty (e.g. Audit smart contract or Extract financial JSON)..."
+                  placeholder="Type any task for autonomous agents to bid on..."
                   className="w-full rounded-xl bg-transparent py-2.5 pl-9 pr-3 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
                 />
               </div>
@@ -120,9 +124,9 @@ export const Hero: React.FC<HeroProps> = ({ stats, onQuickTask }) => {
                   aria-label="Budget in ETH"
                   className="rounded-lg bg-sky-50 px-2 py-1 text-xs font-bold text-sky-700 border border-sky-200 focus:outline-none"
                 >
+                  <option value={0.015}>0.015 ETH</option>
                   <option value={0.02}>0.020 ETH</option>
-                  <option value={0.035}>0.035 ETH</option>
-                  <option value={0.05}>0.050 ETH</option>
+                  <option value={0.03}>0.030 ETH</option>
                 </select>
 
                 <button
@@ -138,27 +142,43 @@ export const Hero: React.FC<HeroProps> = ({ stats, onQuickTask }) => {
             </div>
           </form>
 
-          {/* Quick template chips */}
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
-            <span className="text-[11px] font-medium text-slate-400">Quick Test:</span>
-            {quickTemplates.map((template, idx) => (
-              <button
-                key={idx}
-                onClick={() =>
-                  onQuickTask({
-                    title: template.title,
-                    description: template.desc,
-                    category: template.category,
-                    budgetEth: template.budget,
-                    workerStakeRequiredEth: template.stake,
-                  })
-                }
-                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white/80 px-2 py-0.5 text-[11px] font-medium text-slate-600 transition hover:border-sky-300 hover:bg-sky-50/70 hover:text-sky-700 cursor-pointer"
-              >
-                <span>⚡</span>
-                <span>{template.title}</span>
-              </button>
-            ))}
+          {/* Understandable Judge Showcase Templates */}
+          <div className="mt-4">
+            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
+              ⚡ 1-Click Judge Demos (Real-World Use Cases):
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {quickTemplates.map((template, idx) => (
+                <button
+                  key={idx}
+                  onClick={() =>
+                    onQuickTask({
+                      title: template.title,
+                      description: template.desc,
+                      category: template.category,
+                      budgetEth: template.budget,
+                      workerStakeRequiredEth: template.stake,
+                    })
+                  }
+                  className="flex flex-col text-left p-2.5 rounded-xl border border-sky-100 bg-white/90 hover:border-sky-300 hover:bg-sky-50/80 hover:shadow-xs transition cursor-pointer group"
+                >
+                  <div className="flex items-center justify-between gap-1 mb-1">
+                    <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-sky-100 text-sky-800">
+                      {template.tag}
+                    </span>
+                    <span className="text-[10px] font-bold text-emerald-700 font-mono">
+                      {template.budget} ETH
+                    </span>
+                  </div>
+                  <div className="text-xs font-extrabold text-slate-900 group-hover:text-sky-700 transition line-clamp-1">
+                    {template.title}
+                  </div>
+                  <p className="text-[10px] text-slate-500 line-clamp-2 mt-0.5 leading-snug">
+                    {template.desc}
+                  </p>
+                </button>
+              ))}
+            </div>
           </div>
 
         </div>
