@@ -1,0 +1,56 @@
+{
+  "model_name": "Random Forest Regressor",
+  "features": [
+    "prompt_tokens",
+    "competitor_count",
+    "is_high_quorum",
+    "is_groq",
+    "category_code_audit",
+    "category_data_extraction",
+    "category_finance",
+    "category_sentiment"
+  ],
+  "scaler_mean": [
+    325.1505806379882,
+    4.444642857142857,
+    0.23785714285714285,
+    0.65,
+    0.3107142857142857,
+    0.19785714285714287,
+    0.29428571428571426,
+    0.19714285714285715
+  ],
+  "scaler_scale": [
+    290.5797373048175,
+    2.282027579248108,
+    0.4257712090418745,
+    0.47696960070847283,
+    0.4627860395121561,
+    0.39838385243073177,
+    0.4557210030852881,
+    0.3978411127829905
+  ],
+  "intercept": 0.01755276209232646,
+  "coefficients": {
+    "prompt_tokens": 0.007883996769330713,
+    "competitor_count": -0.002703937437073386,
+    "is_high_quorum": 0.001740459900966153,
+    "is_groq": -5.579589548198144e-06,
+    "category_code_audit": 0.0030095616648717354,
+    "category_data_extraction": -0.0020127780897853742,
+    "category_finance": 0.00020669831101107486,
+    "category_sentiment": -0.0017220985304905216
+  },
+  "evaluation_metrics": {
+    "Ridge Regression (L2)": {
+      "R2 Score": 0.9124,
+      "MAE (ETH)": 0.00189,
+      "RMSE (ETH)": 0.002804
+    },
+    "Random Forest Regressor": {
+      "R2 Score": 0.9498,
+      "MAE (ETH)": 0.001535,
+      "RMSE (ETH)": 0.002122
+    }
+  }
+}

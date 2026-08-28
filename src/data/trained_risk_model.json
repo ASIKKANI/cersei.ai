@@ -1,0 +1,62 @@
+{
+  "model_name": "Random Forest Classifier",
+  "features": [
+    "reputation",
+    "completed_tasks",
+    "win_rate",
+    "stake_ratio",
+    "bid_deviation",
+    "dispute_rate"
+  ],
+  "scaler_mean": [
+    59.726628515982945,
+    30.104285714285716,
+    86.8172396290723,
+    3.2042937677667855,
+    0.8448929944271661,
+    0.13597088820405995
+  ],
+  "scaler_scale": [
+    23.180457337783498,
+    5.454996024989666,
+    10.39343597444488,
+    5.323714525430993,
+    0.2409835602669351,
+    0.1075833404073806
+  ],
+  "intercept": -3.7275715004017833,
+  "coefficients": {
+    "reputation": -0.8727798460828953,
+    "completed_tasks": 0.034802429986227484,
+    "win_rate": -0.2938913472044965,
+    "stake_ratio": -2.645536578896466,
+    "bid_deviation": -0.36593248584365606,
+    "dispute_rate": 0.22638339347042885
+  },
+  "evaluation_metrics": {
+    "Logistic Regression (Calibrated)": {
+      "Accuracy": 0.9243,
+      "ROC-AUC": 0.774,
+      "CV ROC-AUC (Mean)": 0.8215,
+      "F1-Score": 0.0,
+      "Precision": 0.0,
+      "Recall": 0.0
+    },
+    "Random Forest Classifier": {
+      "Accuracy": 0.9214,
+      "ROC-AUC": 0.7931,
+      "CV ROC-AUC (Mean)": 0.8056,
+      "F1-Score": 0.0,
+      "Precision": 0.0,
+      "Recall": 0.0
+    },
+    "Gradient Boosting Classifier": {
+      "Accuracy": 0.9186,
+      "ROC-AUC": 0.7603,
+      "CV ROC-AUC (Mean)": 0.7962,
+      "F1-Score": 0.0952,
+      "Precision": 0.3,
+      "Recall": 0.0566
+    }
+  }
+}
