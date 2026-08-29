@@ -111,7 +111,7 @@ export const App: React.FC = () => {
   const handleConnectWallet = async () => {
     localStorage.removeItem('cersei_wallet_disconnected');
     try {
-      const { address, balanceEth, chainName: activeChain } = await connectMetaMask();
+      const { address, balanceEth, chainName: activeChain } = await connectMetaMask(true);
       setHumanAddress(address);
       setHumanBalanceEth(balanceEth);
       setChainName(activeChain);
@@ -125,7 +125,9 @@ export const App: React.FC = () => {
         colors: ['#10b981', '#34d399', '#6ee7b7'],
       });
     } catch (err: any) {
-      alert(err.message || 'Failed to connect MetaMask');
+      if (err.message && !err.message.includes('cancelled')) {
+        alert(err.message || 'Failed to connect MetaMask');
+      }
     }
   };
 

@@ -32,9 +32,10 @@ export interface WalletState {
 let connectingPromise: Promise<WalletState> | null = null;
 
 /**
- * Connect to MetaMask and query balance & chain with auto-recovery and debounce
+ * Connect to MetaMask and query balance & chain.
+ * @param forcePrompt When true, explicitly forces MetaMask account selection popup to open.
  */
-export async function connectMetaMask(): Promise<WalletState> {
+export async function connectMetaMask(forcePrompt: boolean = false): Promise<WalletState> {
   if (typeof window === 'undefined' || !window.ethereum) {
     throw new Error('MetaMask is not installed. Please install the MetaMask browser extension to continue.');
   }
@@ -45,27 +46,49 @@ export async function connectMetaMask(): Promise<WalletState> {
 
   connectingPromise = (async () => {
     try {
-      // Check if accounts are already connected first without popping up
       let accounts: string[] = [];
-      try {
-        accounts = await window.ethereum.request({ method: 'eth_accounts' });
-      } catch {}
 
-      // If no accounts authorized yet, request permission
-      if (!accounts || accounts.length === 0) {
+      if (forcePrompt) {
+        // Explicitly open MetaMask account selection popup
         try {
-          accounts = await window.ethereum.request({
-            method: 'eth_requestAccounts',
+          const permissions = await window.ethereum.request({
+            method: 'wallet_requestPermissions',
+            params: [{ eth_accounts: {} }],
           });
-        } catch (reqErr: any) {
-          if (reqErr.code === -32002 || reqErr.message?.includes('already pending')) {
-            throw new Error('A MetaMask authorization popup is already open. Please open your MetaMask browser extension toolbar to approve the connection.');
+          const accountsCaveat = permissions?.[0]?.caveats?.find((c: any) => c.type === 'filterResponse' || c.name === 'exposedAccounts');
+          if (accountsCaveat?.value && accountsCaveat.value.length > 0) {
+            accounts = accountsCaveat.value;
           }
-          if (reqErr.code === 4001) {
-            throw new Error('MetaMask connection request was cancelled by user.');
+        } catch (permErr: any) {
+          if (permErr.code === 4001) {
+            throw new Error('Connection request was cancelled in MetaMask.');
           }
-          throw reqErr;
+          if (permErr.code === -32002 || permErr.message?.includes('already pending')) {
+            throw new Error('A MetaMask popup is already pending. Please click the MetaMask extension icon in your browser toolbar to approve.');
+          }
+          // If wallet_requestPermissions is not supported by provider, fallback to eth_requestAccounts
         }
+
+        if (!accounts || accounts.length === 0) {
+          try {
+            accounts = await window.ethereum.request({
+              method: 'eth_requestAccounts',
+            });
+          } catch (reqErr: any) {
+            if (reqErr.code === 4001) {
+              throw new Error('Connection request was cancelled in MetaMask.');
+            }
+            if (reqErr.code === -32002 || reqErr.message?.includes('already pending')) {
+              throw new Error('A MetaMask popup is already pending. Please click the MetaMask extension icon in your browser toolbar to approve.');
+            }
+            throw reqErr;
+          }
+        }
+      } else {
+        // Silent check on mount
+        try {
+          accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        } catch {}
       }
 
       if (!accounts || accounts.length === 0) {
