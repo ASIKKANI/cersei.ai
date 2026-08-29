@@ -26,12 +26,12 @@ export const Hero: React.FC<HeroProps> = ({ stats, onQuickTask }) => {
   // Clear, intuitive, real-world judge showcase templates
   const quickTemplates = [
     {
-      title: 'Fact-Check & Summarize AI News',
-      desc: 'Summarize the latest AI breakthrough article into 3 clear key takeaways with factual verification.',
-      category: 'data_extraction' as AgentCategory,
-      budget: 0.02,
-      stake: 0.01,
-      tag: 'News & Research',
+      title: 'Code Creation: Generate Staking Contract',
+      desc: 'Generate a production-ready ERC-20 staking vault contract in Solidity with passing unit test assertions.',
+      category: 'code_audit' as AgentCategory,
+      budget: 0.025,
+      stake: 0.012,
+      tag: 'Code Creation',
     },
     {
       title: 'Audit Smart Contract for Hack Bugs',
@@ -40,6 +40,14 @@ export const Hero: React.FC<HeroProps> = ({ stats, onQuickTask }) => {
       budget: 0.03,
       stake: 0.015,
       tag: 'Web3 Security',
+    },
+    {
+      title: 'Fact-Check & Summarize AI News',
+      desc: 'Summarize the latest AI breakthrough article into 3 clear key takeaways with factual verification.',
+      category: 'data_extraction' as AgentCategory,
+      budget: 0.02,
+      stake: 0.01,
+      tag: 'News & Research',
     },
     {
       title: 'Market Sentiment: Bullish or Bearish?',
@@ -142,6 +150,7 @@ export const Hero: React.FC<HeroProps> = ({ stats, onQuickTask }) => {
                 >
                   <option value={0.015}>0.015 ETH</option>
                   <option value={0.02}>0.020 ETH</option>
+                  <option value={0.025}>0.025 ETH</option>
                   <option value={0.03}>0.030 ETH</option>
                 </select>
 
@@ -163,7 +172,7 @@ export const Hero: React.FC<HeroProps> = ({ stats, onQuickTask }) => {
             <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
               ⚡ 1-Click Judge Demos (Real-World Use Cases):
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
               {quickTemplates.map((template, idx) => (
                 <button
                   key={idx}
@@ -179,7 +188,7 @@ export const Hero: React.FC<HeroProps> = ({ stats, onQuickTask }) => {
                   className="flex flex-col text-left p-2.5 rounded-xl border border-sky-100 bg-white/90 hover:border-sky-300 hover:bg-sky-50/80 hover:shadow-xs transition cursor-pointer group"
                 >
                   <div className="flex items-center justify-between gap-1 mb-1">
-                    <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-sky-100 text-sky-800">
+                    <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-sky-100 text-sky-800">
                       {template.tag}
                     </span>
                     <span className="text-[10px] font-bold text-emerald-700 font-mono">
