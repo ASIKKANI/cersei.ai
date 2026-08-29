@@ -3,6 +3,8 @@ import { Sparkles, Zap } from 'lucide-react';
 import { WavesBackground } from './reactbits/WavesBackground';
 import { ShinyText } from './reactbits/ShinyText';
 import { CountUp } from './reactbits/CountUp';
+import { TextLoop } from './reactbits/TextLoop';
+import { Strands } from './reactbits/Strands';
 import type { ProtocolStats, AgentCategory } from '../types';
 
 interface HeroProps {
@@ -66,13 +68,27 @@ export const Hero: React.FC<HeroProps> = ({ stats, onQuickTask }) => {
 
   return (
     <section className="relative overflow-hidden pt-10 pb-16 lg:pt-14 lg:pb-20">
-      {/* Light Blue Waves Canvas */}
+      {/* Background Animated Neural Strands & Waves */}
+      <div className="absolute inset-0 pointer-events-none opacity-40">
+        <Strands
+          colors={['#0284c7', '#38bdf8', '#6366f1', '#a855f7']}
+          count={4}
+          speed={0.4}
+          amplitude={0.9}
+          waviness={1.2}
+          thickness={0.6}
+          glow={2.2}
+          opacity={0.35}
+          intensity={0.6}
+        />
+      </div>
+
       <WavesBackground
-        lineColor="rgba(14, 165, 233, 0.12)"
-        waveSpeedX={0.014}
-        waveSpeedY={0.008}
-        waveAmpX={32}
-        waveAmpY={18}
+        lineColor="rgba(14, 165, 233, 0.09)"
+        waveSpeedX={0.012}
+        waveSpeedY={0.007}
+        waveAmpX={28}
+        waveAmpY={16}
       />
 
       <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
@@ -183,8 +199,26 @@ export const Hero: React.FC<HeroProps> = ({ stats, onQuickTask }) => {
 
         </div>
 
+        {/* Animated React Bits TextLoop Ribbon */}
+        <div className="mt-8 max-w-4xl mx-auto overflow-hidden opacity-90">
+          <TextLoop
+            text="AUTONOMOUS REVERSE AUCTIONS ✦ VIEM SMART WALLETS ✦ 3-AGENT JURY CONSENSUS ✦ ML SLASHING RISK MODELS ✦ GROQ LPU INFERENCE ✦ 100% ESCROW REFUND GUARANTEE"
+            shape="line"
+            speed={75}
+            separator="✦"
+            fontSize={12}
+            fontWeight={800}
+            letterSpacing={1.5}
+            color="#0284c7"
+            ribbon={true}
+            ribbonColor="rgba(224, 242, 254, 0.7)"
+            ribbonWidth={32}
+            pauseOnHover={true}
+          />
+        </div>
+
         {/* 4 Clean Metric Cards */}
-        <div className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-4xl mx-auto">
+        <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-4xl mx-auto">
           
           <div className="rounded-2xl border border-sky-100 bg-white/80 p-4 text-left shadow-2xs backdrop-blur-md">
             <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">

@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, ExternalLink, ShieldCheck, Scale, Zap, FileText, Code2, Clock } from 'lucide-react';
+import { Scanner } from './reactbits/Scanner';
 import type { Task } from '../types';
 
 interface TaskInspectorModalProps {
@@ -23,8 +24,8 @@ export const TaskInspectorModal: React.FC<TaskInspectorModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
-      <div className="relative w-full max-w-3xl rounded-3xl border border-sky-100 bg-white p-6 sm:p-8 shadow-2xl shadow-sky-500/10 max-h-[92vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-md">
+      <div className="relative w-full max-w-3xl rounded-3xl border border-sky-200 bg-white p-6 sm:p-8 shadow-2xl shadow-sky-500/15 max-h-[92vh] overflow-y-auto">
         
         {/* Close */}
         <button
@@ -57,7 +58,7 @@ export const TaskInspectorModal: React.FC<TaskInspectorModalProps> = ({
           </div>
 
           <div className="text-right">
-            <span className="text-xs text-slate-400">Escrow Value</span>
+            <span className="text-xs text-slate-400 font-semibold">Escrow Cap</span>
             <div className="text-lg font-extrabold text-sky-700">{task.budgetEth} ETH</div>
           </div>
         </div>
@@ -159,21 +160,35 @@ export const TaskInspectorModal: React.FC<TaskInspectorModalProps> = ({
           </div>
         )}
 
-        {/* Submitted Output JSON Deliverable */}
+        {/* Submitted Output JSON Deliverable with Holographic Scanner */}
         {task.executionResult && (
-          <div className="mb-6">
+          <div className="mb-6 relative">
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                 <Code2 className="h-3.5 w-3.5 text-indigo-500" />
-                <span>Worker Execution Deliverable</span>
+                <span>Worker Execution Deliverable & AST Proof</span>
               </h4>
               <span className="text-[10px] font-mono text-slate-400">
                 Latency: {task.executionResult.executionTimeMs}ms | Engine: {task.executionResult.modelUsed}
               </span>
             </div>
-            <pre className="rounded-2xl border border-slate-800 bg-slate-900 p-4 text-[11px] font-mono text-sky-300 overflow-x-auto max-h-48">
-              {task.executionResult.rawText}
-            </pre>
+
+            <div className="relative rounded-2xl border border-slate-800 bg-slate-950 p-4 text-[11px] font-mono text-sky-300 overflow-hidden shadow-xl shadow-sky-950/40">
+              <div className="absolute inset-0 pointer-events-none opacity-20">
+                <Scanner
+                  color1="#0284c7"
+                  color2="#38bdf8"
+                  color3="#ffffff"
+                  speed={0.4}
+                  sweepSpeed={0.2}
+                  scanline={true}
+                  opacity={0.3}
+                />
+              </div>
+              <pre className="relative z-10 overflow-x-auto max-h-52 leading-relaxed">
+                {task.executionResult.rawText}
+              </pre>
+            </div>
           </div>
         )}
 
@@ -200,7 +215,7 @@ export const TaskInspectorModal: React.FC<TaskInspectorModalProps> = ({
                     </div>
                     <p className="text-[11px] text-slate-600">"{v.reasoning}"</p>
                   </div>
-                  <span className="text-[10px] text-slate-400 shrink-0">Staked: {v.stakeLockedEth} ETH</span>
+                  <span className="text-[10px] text-slate-400 shrink-0 font-mono">Staked: {v.stakeLockedEth} ETH</span>
                 </div>
               ))}
             </div>

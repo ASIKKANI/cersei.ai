@@ -1,5 +1,6 @@
 import React from 'react';
-import { Wallet, Sparkles, RefreshCw, Layers, UserPlus, Cpu } from 'lucide-react';
+import { Wallet, Sparkles, RefreshCw, Layers, UserPlus, Cpu, Activity, ShieldAlert, LayoutDashboard, Database } from 'lucide-react';
+import { GooeyNav, type GooeyNavItem } from './reactbits/GooeyNav';
 
 interface NavbarProps {
   activeTab: 'overview' | 'marketplace' | 'pipeline' | 'jury' | 'register' | 'ledger';
@@ -30,6 +31,15 @@ export const Navbar: React.FC<NavbarProps> = ({
   onConnectWallet,
   agentCount,
 }) => {
+  const navItems: GooeyNavItem[] = [
+    { id: 'overview', label: 'Overview', icon: <LayoutDashboard className="h-3.5 w-3.5" /> },
+    { id: 'pipeline', label: 'Live Pipeline', icon: <Activity className="h-3.5 w-3.5" /> },
+    { id: 'marketplace', label: 'Marketplace', icon: <Database className="h-3.5 w-3.5" /> },
+    { id: 'jury', label: 'Jury Arena', icon: <ShieldAlert className="h-3.5 w-3.5" /> },
+    { id: 'register', label: 'Register Agent', icon: <UserPlus className="h-3.5 w-3.5" /> },
+    { id: 'ledger', label: 'Ledger', icon: <Layers className="h-3.5 w-3.5" /> },
+  ];
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-sky-100/80 bg-white/85 backdrop-blur-xl transition-all">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
@@ -59,70 +69,14 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Spacious Tab Navigation */}
-        <nav className="hidden lg:flex items-center gap-1 rounded-full border border-slate-200/80 bg-slate-50/80 p-1 text-xs font-bold text-slate-600">
-          <button
-            onClick={() => setActiveTab('overview')}
-            className={`rounded-full px-4 py-1.5 transition cursor-pointer ${
-              activeTab === 'overview'
-                ? 'bg-white text-sky-600 shadow-xs'
-                : 'hover:text-sky-600'
-            }`}
-          >
-            Overview
-          </button>
-          <button
-            onClick={() => setActiveTab('pipeline')}
-            className={`rounded-full px-4 py-1.5 transition cursor-pointer ${
-              activeTab === 'pipeline'
-                ? 'bg-white text-sky-600 shadow-xs'
-                : 'hover:text-sky-600'
-            }`}
-          >
-            Live Pipeline
-          </button>
-          <button
-            onClick={() => setActiveTab('marketplace')}
-            className={`rounded-full px-4 py-1.5 transition cursor-pointer ${
-              activeTab === 'marketplace'
-                ? 'bg-white text-sky-600 shadow-xs'
-                : 'hover:text-sky-600'
-            }`}
-          >
-            Marketplace
-          </button>
-          <button
-            onClick={() => setActiveTab('jury')}
-            className={`rounded-full px-4 py-1.5 transition cursor-pointer ${
-              activeTab === 'jury'
-                ? 'bg-white text-sky-600 shadow-xs'
-                : 'hover:text-sky-600'
-            }`}
-          >
-            Jury Arena
-          </button>
-          <button
-            onClick={() => setActiveTab('register')}
-            className={`inline-flex items-center gap-1 rounded-full px-4 py-1.5 transition cursor-pointer ${
-              activeTab === 'register'
-                ? 'bg-sky-600 text-white shadow-xs'
-                : 'hover:text-sky-600 font-extrabold text-sky-700 bg-sky-50'
-            }`}
-          >
-            <UserPlus className="h-3 w-3" />
-            <span>Register Agent</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('ledger')}
-            className={`rounded-full px-4 py-1.5 transition cursor-pointer ${
-              activeTab === 'ledger'
-                ? 'bg-white text-sky-600 shadow-xs'
-                : 'hover:text-sky-600'
-            }`}
-          >
-            Ledger
-          </button>
-        </nav>
+        {/* Fluid Gooey Navigation Tabs */}
+        <div className="hidden lg:block">
+          <GooeyNav
+            items={navItems}
+            activeId={activeTab}
+            onSelect={(id) => setActiveTab(id as any)}
+          />
+        </div>
 
         {/* Right Actions & MetaMask Connect */}
         <div className="flex items-center gap-2 sm:gap-3">
