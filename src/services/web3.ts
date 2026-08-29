@@ -29,54 +29,89 @@ export interface WalletState {
   chainName: string;
 }
 
+let connectingPromise: Promise<WalletState> | null = null;
+
 /**
- * Connect to MetaMask and query balance & chain
+ * Connect to MetaMask and query balance & chain with auto-recovery and debounce
  */
 export async function connectMetaMask(): Promise<WalletState> {
   if (typeof window === 'undefined' || !window.ethereum) {
-    throw new Error('MetaMask is not installed. Please install the MetaMask extension to continue.');
+    throw new Error('MetaMask is not installed. Please install the MetaMask browser extension to continue.');
   }
 
-  // Request user accounts
-  const accounts: string[] = await window.ethereum.request({
-    method: 'eth_requestAccounts',
-  });
-
-  if (!accounts || accounts.length === 0) {
-    throw new Error('No accounts selected in MetaMask.');
+  if (connectingPromise) {
+    return connectingPromise;
   }
 
-  const address = getAddress(accounts[0]);
-  const currentChainHex: string = await window.ethereum.request({ method: 'eth_chainId' });
-  const chainId = parseInt(currentChainHex, 16);
+  connectingPromise = (async () => {
+    try {
+      // Check if accounts are already connected first without popping up
+      let accounts: string[] = [];
+      try {
+        accounts = await window.ethereum.request({ method: 'eth_accounts' });
+      } catch {}
 
-  let chainName = 'Ethereum Sepolia';
-  if (chainId === ETHEREUM_SEPOLIA_CHAIN_ID) {
-    chainName = 'Ethereum Sepolia';
-  } else if (chainId === BASE_SEPOLIA_CHAIN_ID) {
-    chainName = 'Base Sepolia';
-  } else {
-    chainName = `Chain #${chainId}`;
-  }
+      // If no accounts authorized yet, request permission
+      if (!accounts || accounts.length === 0) {
+        try {
+          accounts = await window.ethereum.request({
+            method: 'eth_requestAccounts',
+          });
+        } catch (reqErr: any) {
+          if (reqErr.code === -32002 || reqErr.message?.includes('already pending')) {
+            throw new Error('A MetaMask authorization popup is already open. Please open your MetaMask browser extension toolbar to approve the connection.');
+          }
+          if (reqErr.code === 4001) {
+            throw new Error('MetaMask connection request was cancelled by user.');
+          }
+          throw reqErr;
+        }
+      }
 
-  // Fetch balance from MetaMask directly for the active chain
-  let balanceEth = '0.000';
-  try {
-    const hexBal: string = await window.ethereum.request({
-      method: 'eth_getBalance',
-      params: [address, 'latest'],
-    });
-    balanceEth = Number(formatEther(BigInt(hexBal))).toFixed(4);
-  } catch (e) {
-    console.warn('Failed to query balance:', e);
-  }
+      if (!accounts || accounts.length === 0) {
+        throw new Error('No accounts selected in MetaMask.');
+      }
 
-  return {
-    address,
-    balanceEth,
-    chainId,
-    chainName,
-  };
+      const address = getAddress(accounts[0]);
+      let chainId = 11155111;
+      try {
+        const currentChainHex: string = await window.ethereum.request({ method: 'eth_chainId' });
+        chainId = parseInt(currentChainHex, 16);
+      } catch {}
+
+      let chainName = 'Ethereum Sepolia';
+      if (chainId === ETHEREUM_SEPOLIA_CHAIN_ID) {
+        chainName = 'Ethereum Sepolia';
+      } else if (chainId === BASE_SEPOLIA_CHAIN_ID) {
+        chainName = 'Base Sepolia';
+      } else {
+        chainName = `Chain #${chainId}`;
+      }
+
+      // Fetch balance from MetaMask directly for the active chain
+      let balanceEth = '0.000';
+      try {
+        const hexBal: string = await window.ethereum.request({
+          method: 'eth_getBalance',
+          params: [address, 'latest'],
+        });
+        balanceEth = Number(formatEther(BigInt(hexBal))).toFixed(4);
+      } catch (e) {
+        console.warn('Failed to query balance:', e);
+      }
+
+      return {
+        address,
+        balanceEth,
+        chainId,
+        chainName,
+      };
+    } finally {
+      connectingPromise = null;
+    }
+  })();
+
+  return connectingPromise;
 }
 
 /**

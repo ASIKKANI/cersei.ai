@@ -71,6 +71,9 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (typeof window !== 'undefined' && window.ethereum) {
       const syncMetaMask = async () => {
+        if (localStorage.getItem('cersei_wallet_disconnected') === 'true') {
+          return;
+        }
         try {
           const accounts: string[] = await window.ethereum.request({ method: 'eth_accounts' });
           if (accounts && accounts.length > 0) {
@@ -79,17 +82,26 @@ export const App: React.FC = () => {
             setHumanBalanceEth(balanceEth);
             setChainName(activeChain);
             setIsWalletConnected(true);
+            agentEngine.userAddress = address;
           }
         } catch {}
       };
 
       syncMetaMask();
 
-      window.ethereum.on?.('accountsChanged', syncMetaMask);
+      const handleAccountsChanged = (accounts: string[]) => {
+        if (!accounts || accounts.length === 0) {
+          handleDisconnectWallet();
+        } else {
+          syncMetaMask();
+        }
+      };
+
+      window.ethereum.on?.('accountsChanged', handleAccountsChanged);
       window.ethereum.on?.('chainChanged', syncMetaMask);
 
       return () => {
-        window.ethereum?.removeListener?.('accountsChanged', syncMetaMask);
+        window.ethereum?.removeListener?.('accountsChanged', handleAccountsChanged);
         window.ethereum?.removeListener?.('chainChanged', syncMetaMask);
       };
     }
@@ -97,6 +109,7 @@ export const App: React.FC = () => {
 
   // Connect MetaMask Handler
   const handleConnectWallet = async () => {
+    localStorage.removeItem('cersei_wallet_disconnected');
     try {
       const { address, balanceEth, chainName: activeChain } = await connectMetaMask();
       setHumanAddress(address);
@@ -114,6 +127,15 @@ export const App: React.FC = () => {
     } catch (err: any) {
       alert(err.message || 'Failed to connect MetaMask');
     }
+  };
+
+  // Disconnect / Logout Wallet Handler
+  const handleDisconnectWallet = () => {
+    setHumanAddress(null);
+    setHumanBalanceEth('0.000');
+    setIsWalletConnected(false);
+    localStorage.setItem('cersei_wallet_disconnected', 'true');
+    agentEngine.userAddress = '0x71C84093D870B9fC8F8A38F705De5c79A16e91f0';
   };
 
   const handleCommissionTask = (params: {
@@ -139,13 +161,16 @@ export const App: React.FC = () => {
     workerStakeRequiredEth: number;
   }) => {
     agentEngine.postTask({
-      ...params,
-      inputData: '{"target": "Autonomous Network Payload", "timestamp": ' + Date.now() + '}',
-      outputRequirements: 'Deterministic Schema AST verification + invariant check',
-      deadlineMinutes: 10,
+      title: params.title,
+      description: params.description,
+      category: params.category,
+      inputData: 'Payload: Automated system request.',
+      outputRequirements: 'Provide verified, deterministic JSON formatted report with zero hallucinations.',
+      budgetEth: params.budgetEth,
+      workerStakeRequiredEth: params.workerStakeRequiredEth,
+      deadlineMinutes: 30,
       strictness: 'standard',
     });
-
     setActiveTab('pipeline');
   };
 
@@ -157,23 +182,23 @@ export const App: React.FC = () => {
   const handleSeedDemo = () => {
     agentEngine.seedDemoAgents();
     confetti({
-      particleCount: 60,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ['#0284c7', '#38bdf8', '#bae6fd'],
+      particleCount: 50,
+      spread: 60,
+      origin: { y: 0.8 },
+      colors: ['#0284c7', '#38bdf8', '#7dd3fc'],
     });
   };
 
   const handleReset = () => {
-    if (window.confirm('Reset all network agents, tasks, and state to an empty clean slate?')) {
+    if (confirm('Are you sure you want to reset all tasks, agents, and logs to default?')) {
       agentEngine.resetAll();
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-sky-200 selection:text-sky-900">
+    <div className="min-h-screen bg-gradient-to-b from-sky-50/40 via-white to-sky-50/20 text-slate-900 flex flex-col font-sans selection:bg-sky-500 selection:text-white">
       
-      {/* Navbar with MetaMask & Tab Navigation */}
+      {/* Top Navbar */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -186,6 +211,7 @@ export const App: React.FC = () => {
         chainName={chainName}
         isWalletConnected={isWalletConnected}
         onConnectWallet={handleConnectWallet}
+        onDisconnectWallet={handleDisconnectWallet}
         agentCount={agents.length}
       />
 

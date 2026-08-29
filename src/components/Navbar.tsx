@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wallet, Sparkles, RefreshCw, Layers, UserPlus, Cpu, Activity, ShieldAlert, LayoutDashboard, Database } from 'lucide-react';
+import { Wallet, Sparkles, RefreshCw, Layers, UserPlus, Cpu, Activity, ShieldAlert, LayoutDashboard, Database, LogOut } from 'lucide-react';
 import { GooeyNav, type GooeyNavItem } from './reactbits/GooeyNav';
 
 interface NavbarProps {
@@ -14,6 +14,7 @@ interface NavbarProps {
   chainName?: string;
   isWalletConnected: boolean;
   onConnectWallet: () => void;
+  onDisconnectWallet: () => void;
   agentCount: number;
 }
 
@@ -29,6 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   chainName = 'Sepolia Testnet',
   isWalletConnected,
   onConnectWallet,
+  onDisconnectWallet,
   agentCount,
 }) => {
   const navItems: GooeyNavItem[] = [
@@ -100,20 +102,30 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>Post Bounty</span>
           </button>
 
-          {/* Real MetaMask Wallet Connect Button */}
+          {/* Real MetaMask Wallet Connect / Disconnect */}
           {isWalletConnected && humanAddress ? (
-            <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50/60 px-3 py-1.5 shadow-2xs">
-              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-500 text-white">
-                <Wallet className="h-3 w-3" />
-              </div>
-              <div className="text-left">
-                <div className="text-[11px] font-bold text-emerald-950 font-mono">
-                  {humanBalanceEth} <span className="text-emerald-700 font-semibold">ETH</span>
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50/60 px-3 py-1.5 shadow-2xs">
+                <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-500 text-white">
+                  <Wallet className="h-3 w-3" />
                 </div>
-                <div className="text-[9px] text-emerald-800 font-mono">
-                  {humanAddress.slice(0, 6)}...{humanAddress.slice(-4)}
+                <div className="text-left">
+                  <div className="text-[11px] font-bold text-emerald-950 font-mono">
+                    {humanBalanceEth} <span className="text-emerald-700 font-semibold">ETH</span>
+                  </div>
+                  <div className="text-[9px] text-emerald-800 font-mono">
+                    {humanAddress.slice(0, 6)}...{humanAddress.slice(-4)}
+                  </div>
                 </div>
               </div>
+              <button
+                onClick={onDisconnectWallet}
+                className="inline-flex items-center gap-1 rounded-xl border border-rose-200 bg-rose-50/80 px-2.5 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100 transition cursor-pointer shadow-2xs"
+                title="Disconnect and log out wallet"
+              >
+                <LogOut className="h-3.5 w-3.5 text-rose-600" />
+                <span className="hidden sm:inline">Logout</span>
+              </button>
             </div>
           ) : (
             <button
