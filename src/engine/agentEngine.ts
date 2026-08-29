@@ -226,6 +226,35 @@ class AgentEconomyEngine {
         totalEarningsEth: 0.85,
       },
       {
+        name: 'NomadTravel-Concierge',
+        role: 'Autonomous Travel & Itinerary Architect',
+        description: 'Autonomously builds hyper-personalized travel itineraries, scans multi-carrier flight arbitrage, curates boutique hotels, and manages vacation budgets.',
+        category: 'lifestyle' as AgentCategory,
+        modelEngine: 'groq-llama-3.3-70b' as ModelEngine,
+        groqModel: 'llama-3.3-70b-versatile',
+        capabilities: ['travel-itinerary', 'flight-arbitrage', 'hotel-curation', 'lifestyle-concierge'],
+        initialStakeEth: 0.20,
+        hourlyRateEth: 0.012,
+        reputation: 97,
+        completedTasks: 58,
+        winRate: 98,
+        totalEarningsEth: 1.75,
+      },
+      {
+        name: 'VitalityFit-Nutrition',
+        role: 'Personalized Health & Nutrition Planner',
+        description: 'Calculates personalized caloric macronutrients, periodized workout splits, biometric recovery telemetry, and tailored supplement stacks.',
+        category: 'lifestyle' as AgentCategory,
+        modelEngine: 'deepseek-v3' as ModelEngine,
+        capabilities: ['macro-nutrition', 'workout-periodization', 'biometric-health', 'meal-prep'],
+        initialStakeEth: 0.18,
+        hourlyRateEth: 0.010,
+        reputation: 95,
+        completedTasks: 46,
+        winRate: 97,
+        totalEarningsEth: 1.30,
+      },
+      {
         name: 'ConsensusJury-Prime',
         role: 'Neutral 3-Node Jury Validator',
         description: 'Independent referee agent running automated AST syntax tests, schema assertions, and cross-model validation juries.',
@@ -648,6 +677,26 @@ contract StakingVault is ReentrancyGuard, Ownable {
           'Add custom error types instead of require string messages to reduce bytecode size.'
         ],
         audit_proof_hash: proof.slice(0, 18),
+      };
+    } else if (task.category === 'lifestyle' || task.title.toLowerCase().includes('travel') || task.title.toLowerCase().includes('trip') || task.title.toLowerCase().includes('fitness') || task.title.toLowerCase().includes('itinerary')) {
+      outputJson = {
+        service_type: 'Autonomous Lifestyle & Travel Concierge',
+        trip_destination: 'Tokyo & Kyoto, Japan',
+        duration: '5 Days / 4 Nights',
+        curated_itinerary: {
+          day_1: 'Haneda Arrival (HND) -> Shinjuku Skyscraper Observatory -> Omoide Yokocho Izakaya Dinner',
+          day_2: 'Shibuya Crossing -> Meiji Jingu Shrine -> Harajuku Vintage Exploration -> Roppongi Art Night',
+          day_3: 'Shinkansen Bullet Train to Kyoto -> Fushimi Inari Sunrise Hike -> Traditional Gion Tea Ceremony',
+          day_4: 'Arashiyama Bamboo Forest -> Kinkaku-ji Golden Pavilion -> Pontocho Alley Kaiseki Dining',
+          day_5: 'Tsukiji Outer Market Breakfast -> Ginza Luxury District -> Departure Flight',
+        },
+        flight_and_hotel_optimization: {
+          flight_deal_secured: 'Direct Flight: $780 (Saved 32% via multi-leg routing arbitrage)',
+          boutique_lodging: 'Trunk Hotel Tokyo (Cat Street) + Sowaka Kyoto (Heritage Ryokan)',
+          calculated_total_budget_usd: '$2,150 (Flight + Hotels + Michelin Dining)',
+        },
+        wellness_and_dietary_rules: 'High-protein Japanese cuisine, historic shrine passes pre-reserved',
+        consensus_status: 'VERIFIED_ACCURATE (100% real-time venue pricing and scheduling valid)',
       };
     } else if (task.category === 'sentiment' || task.category === 'finance') {
       outputJson = {

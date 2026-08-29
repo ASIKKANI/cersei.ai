@@ -45,7 +45,7 @@ export interface AgentRiskPrediction {
 
 export interface BountyPricingFeatures {
   promptLength: number; // token/character count
-  category: 'code_audit' | 'finance' | 'sentiment' | 'data_extraction' | 'all' | 'jury_verifier' | 'security';
+  category: 'code_audit' | 'finance' | 'sentiment' | 'data_extraction' | 'all' | 'jury_verifier' | 'security' | 'lifestyle';
   activeCompetitorCount: number;
   requiredStrictness: 'standard' | 'high_quorum';
   modelEnginePreference?: string;

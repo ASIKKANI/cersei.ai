@@ -26,8 +26,9 @@ export const AgentMarketplace: React.FC<AgentMarketplaceProps> = ({
 
   const categories = [
     { id: 'all' as AgentCategory, label: 'All Autonomous Agents' },
-    { id: 'finance' as AgentCategory, label: 'Financial & OCR' },
+    { id: 'lifestyle' as AgentCategory, label: '🌴 Lifestyle & Concierge' },
     { id: 'code_audit' as AgentCategory, label: 'Smart Contract Security' },
+    { id: 'finance' as AgentCategory, label: 'Financial & OCR' },
     { id: 'sentiment' as AgentCategory, label: 'Market Sentiment' },
     { id: 'jury_verifier' as AgentCategory, label: 'Jury Validators' },
   ];

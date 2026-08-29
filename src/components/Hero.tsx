@@ -26,6 +26,14 @@ export const Hero: React.FC<HeroProps> = ({ stats, onQuickTask }) => {
   // Clear, intuitive, real-world judge showcase templates
   const quickTemplates = [
     {
+      title: 'Lifestyle: 5-Day Tokyo & Kyoto Trip Itinerary',
+      desc: 'Build hour-by-hour itinerary, flight deals, hotel curation, and daily budget optimization.',
+      category: 'lifestyle' as AgentCategory,
+      budget: 0.018,
+      stake: 0.008,
+      tag: 'Lifestyle Concierge',
+    },
+    {
       title: 'Code Creation: Generate Staking Contract',
       desc: 'Generate a production-ready ERC-20 staking vault contract in Solidity with passing unit test assertions.',
       category: 'code_audit' as AgentCategory,
@@ -172,7 +180,7 @@ export const Hero: React.FC<HeroProps> = ({ stats, onQuickTask }) => {
             <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
               ⚡ 1-Click Judge Demos (Real-World Use Cases):
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2">
               {quickTemplates.map((template, idx) => (
                 <button
                   key={idx}

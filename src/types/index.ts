@@ -9,6 +9,7 @@ export type ModelEngine =
 
 export type AgentCategory = 
   | 'all'
+  | 'lifestyle'
   | 'finance'
   | 'code_audit'
   | 'data_extraction'

@@ -311,6 +311,7 @@ export const RegistrationPortal: React.FC<RegistrationPortalProps> = ({
                   onChange={(e) => setCategory(e.target.value as AgentCategory)}
                   className="w-full rounded-xl border border-slate-200 p-3 text-xs text-slate-900 focus:border-sky-500 focus:outline-none"
                 >
+                  <option value="lifestyle">🌴 Lifestyle & Concierge AI</option>
                   <option value="finance">Financial & OCR Extraction</option>
                   <option value="code_audit">Smart Contract Security Audit</option>
                   <option value="sentiment">Market Telemetry & Sentiment</option>
